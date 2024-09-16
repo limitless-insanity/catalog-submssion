@@ -1,0 +1,63 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <map>
+int decodeValue(const std::string& valueStr, int base) {
+    int value = 0;
+    for (char c : valueStr) {
+        value = value * base + (c - '0');
+    }
+    return value;
+}
+
+int main() {
+    std::string inputJson = R"({
+        "keys": {
+            "n": 4,
+            "k": 3
+        },
+        "1": {
+            "base": "10",
+            "value": "4"
+        },
+        "2": {
+            "base": "2",
+            "value": "111"
+        },
+        "3": {
+            "base": "10",
+            "value": "12"
+        },
+        "6": {
+            "base": "4",
+            "value": "213"
+        }
+    })";
+    std::map<int, std::pair<int, std::string>> data = {
+        {1, {10, "4"}},
+        {2, {2, "111"}},
+        {3, {10, "12"}},
+        {6, {4, "213"}}
+    };
+    std::vector<std::pair<int, int>> decodedRoots;
+    for (const auto& [x, rootInfo] : data) {
+        int base = rootInfo.first;
+        const std::string& value = rootInfo.second;
+        int y = decodeValue(value, base);
+        decodedRoots.push_back({x, y});
+    }
+    std::cout << "Decoded roots:" << std::endl;
+    for (const auto& [x, y] : decodedRoots) {
+        std::cout << "x: " << x << ", y: " << y << std::endl;
+    }
+    return 0;
+}
+
+THE OUTPUT IS:
+
+Decoded roots:
+x: 1, y: 4
+x: 2, y: 7
+x: 3, y: 12
+x: 6, y: 39

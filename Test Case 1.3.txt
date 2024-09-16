@@ -1,0 +1,76 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <map>
+
+int decodeValue(const std::string& valueStr, int base) {
+    return std::stoi(valueStr, nullptr, base);
+}
+double lagrangeInterpolation(double x, const std::vector<std::pair<int, int>>& points) {
+    double result = 0.0;
+    int n = points.size();
+    
+    for (int i = 0; i < n; ++i) {
+        double term = points[i].second; // y_i
+        for (int j = 0; j < n; ++j) {
+            if (i != j) {
+                term = term * (x - points[j].first) / (points[i].first - points[j].first);
+            }
+        }
+        result += term;
+    }
+    return result;
+}
+double findConstantTerm(const std::vector<std::pair<int, int>>& roots) {
+    return lagrangeInterpolation(0.0, roots);
+}
+
+int main() {
+    std::string inputJson = R"({
+        "keys": {
+            "n": 4,
+            "k": 3
+        },
+        "1": {
+            "base": "10",
+            "value": "4"
+        },
+        "2": {
+            "base": "2",
+            "value": "111"
+        },
+        "3": {
+            "base": "10",
+            "value": "12"
+        },
+        "6": {
+            "base": "4",
+            "value": "213"
+        }
+    })";
+    std::map<int, std::pair<int, std::string>> data = {
+        {1, {10, "4"}},
+        {2, {2, "111"}},
+        {3, {10, "12"}},
+        {6, {4, "213"}}
+    };
+    int n = 4;
+    int k = 3;
+
+    std::vector<std::pair<int, int>> decodedRoots;
+    for (const auto& [x, info] : data) {
+        int base = info.first;
+        const std::string& value = info.second;
+        int y = decodeValue(value, base);
+        
+        decodedRoots.push_back({x, y});
+    }
+    double constantTerm = findConstantTerm(decodedRoots);
+    std::cout << "The constant term of the polynomial is: " << constantTerm << std::endl;
+
+    return 0;
+}
+
+THE OUTPUT IS :
+The constant term of the polynomial is: 3

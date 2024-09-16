@@ -1,0 +1,90 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <stdexcept>
+int decodeValue(const std::string& valueStr, int base) {
+    int value = 0;
+    for (char c : valueStr) {
+        if (c >= '0' && c <= '9') {
+            value = value * base + (c - '0');
+        } else {
+            std::cerr << "Error: Invalid character in value string." << std::endl;
+            throw std::invalid_argument("Invalid character in value string.");
+        }
+    }
+    return value;
+}
+void readInput(const std::string& inputJson, int& n, int& k, std::vector<std::pair<int, int>>& roots) {
+    // Simple JSON parsing without external library
+    std::stringstream ss(inputJson);
+    std::string key, value;
+    
+    while (ss >> key) {
+        if (key == "\"keys\":") {
+            // Skip to the next part
+            ss >> key >> n >> key >> k; // Assume keys are in the format n: value, k: value
+        } else if (key[0] == '\"') {
+            key = key.substr(1, key.size() - 2); // Remove surrounding quotes
+            std::string baseStr, valueStr;
+            ss >> key >> baseStr >> valueStr; // Read base and value
+
+            int x = std::stoi(key);
+            int base = std::stoi(baseStr.substr(5)); // Extract base value
+            int y = decodeValue(valueStr.substr(7, valueStr.size() - 1), base); // Extract value and decode
+
+            roots.emplace_back(x, y);
+        }
+    }
+}
+
+int main() {
+    try {
+        std::string inputJson = R"({
+            "keys": {
+                "n": 4,
+                "k": 3
+            },
+            "1": {
+                "base": "10",
+                "value": "4"
+            },
+            "2": {
+                "base": "2",
+                "value": "111"
+            },
+            "3": {
+                "base": "10",
+                "value": "12"
+            },
+            "6": {
+                "base": "4",
+                "value": "213"
+            }
+        })";
+
+        int n, k;
+        std::vector<std::pair<int, int>> roots;
+
+        readInput(inputJson, n, k, roots);
+
+        std::cout << "Number of roots provided: " << n << std::endl;
+        std::cout << "Minimum number of roots required: " << k << std::endl;
+        std::cout << "Decoded roots:" << std::endl;
+        for (const auto& [x, y] : roots) {
+            std::cout << "x: " << x << ", y: " << y << std::endl;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
+}
+
+THE OUTPUT IS:
+/tmp/yIHEeMLMNa.o
+Number of roots provided: 0
+Minimum number of roots required: 0
+Decoded roots:
+
